@@ -22,7 +22,7 @@ services:
     container_name: axel-nginx
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8055:80"
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
