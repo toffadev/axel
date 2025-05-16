@@ -11,7 +11,7 @@ export default defineConfig({
                 'resources/js/client.js',
                 'resources/js/admin.js'
             ],
-            refresh: true,
+//            refresh: false,
         }),
         vue({
             template: {
@@ -22,6 +22,7 @@ export default defineConfig({
             },
         }),
     ],
+    
      resolve: {
         alias: {
             '@': resolve(__dirname, 'resources/js'),
@@ -39,5 +40,9 @@ export default defineConfig({
             '@admin/Layouts': resolve(__dirname, 'resources/js/Admin/Layouts'),
             '@admin/Pages': resolve(__dirname, 'resources/js/Admin/Pages')
         },
+    },
+    server: {
+        https: true,
+        host: 'axelmerryl.datm.tech'
     },
 });
