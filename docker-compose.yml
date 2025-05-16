@@ -15,7 +15,6 @@ services:
       - axel-network
     depends_on:
       - mysql
-      - redis
 
   # Service Nginx
   nginx:
@@ -49,28 +48,20 @@ services:
     container_name: axel-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-axel}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_USER: ${DB_USERNAME:-axel}
+      MYSQL_DATABASE: axel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: axelpassword
+      MYSQL_USER: axel
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     ports:
-      - "3306:3306"
+      - "3336:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./axel.sql:/docker-entrypoint-initdb.d/axel.sql
     networks:
       - axel-network
 
-  # Service Redis
-  redis:
-    image: redis:alpine
-    container_name: axel-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    networks:
-      - axel-network
 
 networks:
   axel-network:
