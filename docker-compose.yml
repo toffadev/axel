@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Service PHP (Laravel)
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: axel-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - axel-network
+    depends_on:
+      - mysql
+      - redis
+
+  # Service Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: axel-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - axel-network
+    depends_on:
+      - app
+
+  # Service Node.js
+  node:
+    image: node:20-alpine
+    container_name: axel-node
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - axel-network
+
+  # Service MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: axel-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-axel}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-axel}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - axel-network
+
+  # Service Redis
+  redis:
+    image: redis:alpine
+    container_name: axel-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - axel-network
+
+networks:
+  axel-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local 
